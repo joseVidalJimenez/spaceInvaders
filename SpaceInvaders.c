@@ -32,6 +32,21 @@
  http://users.ece.utexas.edu/~valvano/
  */
 
+#include "SpaceInvaders.h"
+#ifndef TEST_WITHOUT_IO
+#  include "..//tm4c123gh6pm.h"
+#  include "TExaS.h"
+#endif
+#include "Nokia5110.h"
+#include "Init.h"
+#include "Buttons.h"
+#include "GameEngine.h"
+#include "random.h"
+#include "Message.h"
+#include "utils.h"
+#include "Sound.h"
+#include "debug.h"
+
 
 /*	Required Hardware I/O connections
 Slide pot pin 1 connected to ground
@@ -90,20 +105,6 @@ gameStatus: End game@: FirstLast, EnemyLaserCollisions@MasterDraw
 //messages
 #define SWAPDELAYMSG 10
 #define SWAPDELAYMSG_2 SWAPDELAYMSG*2
-
-#ifndef TEST_WITHOUT_IO
-#  include "..//tm4c123gh6pm.h"
-#  include "TExaS.h"
-#endif
-#include "Nokia5110.h"
-#include "Init.h"
-#include "Buttons.h"
-#include "GameEngine.h"
-#include "random.h"
-#include "Message.h"
-#include "utils.h"
-#include "sound.h"
-#include "debug.h"
 
 volatile unsigned char SysTickFlag = 0;
 volatile unsigned int gameOverFlag = STANDBY;
@@ -196,11 +197,15 @@ void SysTick_Handler(void){			// runs at 30 Hz
 			if(swapMessage < SWAPDELAYMSG){
 				if(gameOverFlag == LOOSE){
 					GameOverMessage();
+#ifndef TEST_WITHOUT_IO
 					GPIO_PORTB_DATA_R |= 0x20;
+#endif
 				}
 				else{
 					WinMessage();
+#ifndef TEST_WITHOUT_IO
 					GPIO_PORTB_DATA_R |= 0x10;
+#endif
 				}
 			}
 			else{
@@ -223,7 +228,9 @@ void SysTick_Handler(void){			// runs at 30 Hz
 				BonusEnemy_Move(RESET);
 #endif
 				clickCounter = 0;
+#ifndef TEST_WITHOUT_IO
 				GPIO_PORTB_DATA_R &= ~0x30;
+#endif
 				gameOverFlag = STANDBY;
 			}
 		}
